@@ -18,12 +18,13 @@
   "bugs": {
     "url": "https://github.com/erlimar/jquery-app-architecture/issues"
   },
-  "homepage": "https://github.com/erlimar/jquery-app-architecture#readme",
+  "homepage": "https://github.com/erlimar/jquery-app-architecture",
   "devDependencies": {
-    "gulp": "^3.9.1"
-  },
-  "dependencies": {
+    "gulp": "^3.9.1",
+    "gulp-uglify": "^3.0.0",
+    "del": "^3.0.0",
     "gulp-concat": "^2.6.1",
+    "gulp-concat-util": "^0.5.5",
     "gulp-sourcemaps": "^2.6.4"
   }
 }

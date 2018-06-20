@@ -1,12 +1,31 @@
-var gulp = require('gulp');
-var concat = require('gulp-concat');
-var sourcemaps = require('gulp-sourcemaps');
+var fs = require('fs'),
+    del = require('del'),
+    gulp = require('gulp'),
+    concat = require('gulp-concat-util'),
+    uglify = require("gulp-uglify"),
+    pkg = require('./package.json');
 
-gulp.task('dist', function () {
-    return gulp.src(['app.js', 'core.js', 'utils.js'])
-        .pipe(sourcemaps.init())
+var headerTxt = fs.readFileSync('./header.txt'),
+    bannerTxt = fs.readFileSync('./banner.txt');
+
+gulp.task('clean', function () {
+    return del('dist/**/*');
+});
+
+gulp.task('js', function () {
+    return gulp.src('lib/**/*.js')
+        .pipe(concat.header(bannerTxt, { pkg: pkg }))
         .pipe(concat('e5r-jquery-arch.js'))
-        .pipe(sourcemaps.write())
+        .pipe(concat.header(headerTxt, { pkg: pkg }))
         .pipe(gulp.dest('dist'))
 });
 
+gulp.task('js-min', function () {
+    return gulp.src('lib/**/*.js')
+        .pipe(concat('e5r-jquery-arch.min.js'))
+        .pipe(uglify())
+        .pipe(concat.header(headerTxt, { pkg: pkg }))
+        .pipe(gulp.dest('dist'))
+});
+
+gulp.task('dist', ['js', 'js-min'])
