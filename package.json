@@ -1,0 +1,29 @@
+{
+  "name": "e5r-jquery-arch",
+  "version": "1.0.0",
+  "description": "Arquitetura de aplicação jQuery",
+  "main": "app.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/erlimar/jquery-app-architecture.git"
+  },
+  "keywords": [
+    "e5r",
+    "jquery",
+    "arch",
+    "architecture"
+  ],
+  "author": "Erlimar Silva Campos (erlimar@gmail.com)",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/erlimar/jquery-app-architecture/issues"
+  },
+  "homepage": "https://github.com/erlimar/jquery-app-architecture#readme",
+  "devDependencies": {
+    "gulp": "^3.9.1"
+  },
+  "dependencies": {
+    "gulp-concat": "^2.6.1",
+    "gulp-sourcemaps": "^2.6.4"
+  }
+}
