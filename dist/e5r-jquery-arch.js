@@ -9,80 +9,83 @@
 // app.js
 // ========================================================================
 +function ($, root, App) {
+	; function require(_) { return App[_] = App[_] || {} }
+	(function () {
 
-	var core = App.core = App.core || {}
-	var utils = App.utils = App.utils || {}
+		var core = require('core')
+		var utils = require('utils')
 
-	var CONTROLLER_IDENTIFIER = 'app-controller'
-	var BIND_IDENTIFIER = 'app-bind'
-	var CONTROLLER_SELECTOR = '[data-app-controller]'
-	var BIND_SELECTOR = '[data-app-bind]'
-	var COMPONENT_SELECTOR_KEY = 'SELECTOR'
-    var COMPONENT_NAME_KEY = 'NAME'
-    var COMPONENT_SUFFIX = '-component'
+		var CONTROLLER_IDENTIFIER = 'app-controller'
+		var BIND_IDENTIFIER = 'app-bind'
+		var CONTROLLER_SELECTOR = '[data-app-controller]'
+		var BIND_SELECTOR = '[data-app-bind]'
+		var COMPONENT_SELECTOR_KEY = 'SELECTOR'
+		var COMPONENT_NAME_KEY = 'NAME'
+		var COMPONENT_SUFFIX = '-component'
 
-	var setTitle = function () {
-		var appTitle = core.getConfig('app.title')
-		
-		if (appTitle)
-			$(document).attr('title', appTitle)
-	}
+		var setTitle = function () {
+			var appTitle = core.getConfig('app.title')
 
-	var installControllers = function () {
-		$(CONTROLLER_SELECTOR, root).each(function () {
-			var el = $(this)
-			var name = el.data(CONTROLLER_IDENTIFIER)
-			var ctor = core.controller(name)
-			var ctrl = ctor(el)
+			if (appTitle)
+				$(document).attr('title', appTitle)
+		}
 
-			connect(el, ctrl)
-			initComponents(el, ctrl)
-		})
-	}
+		var installControllers = function () {
+			$(CONTROLLER_SELECTOR, root).each(function () {
+				var el = $(this)
+				var name = el.data(CONTROLLER_IDENTIFIER)
+				var ctor = core.controller(name)
+				var ctrl = ctor(el)
 
-	var connect = function (el, ctrl) {
-		$(BIND_SELECTOR, el).each(function () {
-			var el = $(this)
-			var binder = el.data(BIND_IDENTIFIER)
+				connect(el, ctrl)
+				initComponents(el, ctrl)
+			})
+		}
 
-			if (!utils.isString(binder) || 0 > binder.indexOf(':')) return
+		var connect = function (el, ctrl) {
+			$(BIND_SELECTOR, el).each(function () {
+				var el = $(this)
+				var binder = el.data(BIND_IDENTIFIER)
 
-			binder = binder.split(':')
+				if (!utils.isString(binder) || 0 > binder.indexOf(':')) return
 
-			if (!utils.isArray(binder) || binder.length < 2) retun
+				binder = binder.split(':')
 
-			var event = binder[0]
-			var handler = ctrl[binder[1]]
+				if (!utils.isArray(binder) || binder.length < 2) retun
 
-			if (!utils.isString(event) || !utils.isFunction(handler)) return
+				var event = binder[0]
+				var handler = ctrl[binder[1]]
 
-			el.on(event, handler)
-			el.ctrl(ctrl)
-		})
-	}
+				if (!utils.isString(event) || !utils.isFunction(handler)) return
 
-	var initComponents = function (el, ctrl) {
-        core.listComponents().map(function (cmp) {
-            if (!utils.isString(cmp.id)) return
-            if (!utils.isFunction(cmp.component)) return
-            if (!utils.isString(cmp.component[COMPONENT_SELECTOR_KEY])) return
-            if (!utils.isString(cmp.component[COMPONENT_NAME_KEY])) return
-            if (cmp.id.lastIndexOf(COMPONENT_SUFFIX) !== cmp.id.length - COMPONENT_SUFFIX.length) return
+				el.on(event, handler)
+				el.ctrl(ctrl)
+			})
+		}
 
-            var jqSelector = cmp.component[COMPONENT_SELECTOR_KEY]
-            var jqFn = cmp.component[COMPONENT_NAME_KEY]
+		var initComponents = function (el, ctrl) {
+			core.listComponents().map(function (cmp) {
+				if (!utils.isString(cmp.id)) return
+				if (!utils.isFunction(cmp.component)) return
+				if (!utils.isString(cmp.component[COMPONENT_SELECTOR_KEY])) return
+				if (!utils.isString(cmp.component[COMPONENT_NAME_KEY])) return
+				if (cmp.id.lastIndexOf(COMPONENT_SUFFIX) !== cmp.id.length - COMPONENT_SUFFIX.length) return
 
-            $(jqSelector, el)[jqFn](el)
-        })
-    }
+				var jqSelector = cmp.component[COMPONENT_SELECTOR_KEY]
+				var jqFn = cmp.component[COMPONENT_NAME_KEY]
 
-	var install = function () {
-		setTitle()
-		installControllers()
-	}
+				$(jqSelector, el)[jqFn](el)
+			})
+		}
 
-	$(root).ready(install)
+		var install = function () {
+			setTitle()
+			installControllers()
+		}
 
+		$(root).ready(install)
+
+	})()
 }(jQuery, document, window.ClientApp = window.ClientApp || {});
 
 
@@ -90,97 +93,99 @@
 // core.js
 // ========================================================================
 +function ($, App) {
+    ; function require(_) { return App[_] = App[_] || {} }
+    (function (exports) {
 
-    var exports = App.core = App.core || {}
-    var controllers = App.controllers = App.controllers || {}
-    var components = App.components = App.components || {}
-    var utils = App.utils = App.utils || {}
-    var config = App.config = App.config || {}
+        var controllers = require('controllers')
+        var components = require('components')
+        var utils = require('utils')
+        var config = require('config')
 
-    var CONTROLLER_SUFFIX = '-controller'
-    var COMPONENT_SUFFIX = '-component'
+        var CONTROLLER_SUFFIX = '-controller'
+        var COMPONENT_SUFFIX = '-component'
 
-    function _registerAndGetController(ctrlName, ctrlConstructor) {
-        if (utils.isString(ctrlName) && utils.isFunction(ctrlConstructor)) {
-            return controllers[ctrlName + CONTROLLER_SUFFIX] = ctrlConstructor
+        function _registerAndGetController(ctrlName, ctrlConstructor) {
+            if (utils.isString(ctrlName) && utils.isFunction(ctrlConstructor)) {
+                return controllers[ctrlName + CONTROLLER_SUFFIX] = ctrlConstructor
+            }
+
+            if (utils.isString(ctrlName)) {
+                var ctrl = controllers[ctrlName + CONTROLLER_SUFFIX]
+
+                return utils.isFunction(ctrl)
+                    ? ctrl
+                    : function () { }
+            }
+
+            return function () { };
         }
 
-        if (utils.isString(ctrlName)) {
-            var ctrl = controllers[ctrlName + CONTROLLER_SUFFIX]
+        function _listComponents() {
+            var list = []
 
-            return utils.isFunction(ctrl)
-                ? ctrl
-                : function () { }
+            for (var c in components)
+                list.push({
+                    id: c,
+                    component: components[c]
+                })
+
+            return list
         }
 
-        return function () { };
-    }
+        function _getComponent(cmpName) {
+            if (utils.isString(cmpName)) {
+                var cmp = components[cmpName + COMPONENT_SUFFIX]
 
-    function _listComponents() {
-        var list = []
+                return utils.isFunction(cmp)
+                    ? cmp
+                    : function () { }
+            }
 
-        for (var c in components)
-            list.push({
-                id: c,
-                component: components[c]
-            })
-
-        return list
-    }
-
-    function _getComponent(cmpName) {
-        if (utils.isString(cmpName)) {
-            var cmp = components[cmpName + COMPONENT_SUFFIX]
-
-            return utils.isFunction(cmp)
-                ? cmp
-                : function () { }
+            return function () { };
         }
 
-        return function () { };
-    }
+        function _getConfig(key, defaultValue) {
+            if (!utils.isString(key)) return
 
-    function _getConfig(key, defaultValue) {
-        if (!utils.isString(key)) return
+            var value = config,
+                keys = key.split('.'),
+                k = 0
 
-        var value = config,
-            keys = key.split('.'),
-            k = 0
+            while (value && k < keys.length) {
+                value = value[keys[k]];
+                k++
+            }
 
-        while (value && k < keys.length) {
-            value = value[keys[k]];
-            k++
+            return value || defaultValue
         }
 
-        return value || defaultValue
-    }
+        function _setConfig(key, newValue) {
+            if (!utils.isString(key)) return
 
-    function _setConfig(key, newValue) {
-        if (!utils.isString(key)) return
+            var value = config,
+                keys = key.split('.'),
+                k = 0
 
-        var value = config,
-            keys = key.split('.'),
-            k = 0
+            while (value && k < keys.length) {
+                if (typeof value[keys[k]] !== 'object')
+                    value[keys[k]] = {}
 
-        while (value && k < keys.length) {
-            if (typeof value[keys[k]] !== 'object')
-                value[keys[k]] = {}
+                if (k + 1 !== keys.length)
+                    value = value[keys[k]]
 
-            if (k + 1 !== keys.length)
-                value = value[keys[k]]
+                k++
+            }
 
-            k++
+            return value[keys[--k]] = newValue
         }
 
-        return value[keys[--k]] = newValue
-    }
+        exports.controller = _registerAndGetController
+        exports.component = _getComponent
+        exports.listComponents = _listComponents
+        exports.getConfig = _getConfig
+        exports.setConfig = _setConfig
 
-    exports.controller = _registerAndGetController
-    exports.component = _getComponent
-    exports.listComponents = _listComponents
-    exports.getConfig = _getConfig
-    exports.setConfig = _setConfig
-
+    })(App.core = App.core || {})
 }(jQuery, window.ClientApp = window.ClientApp || {});
 
 
@@ -188,31 +193,32 @@
 // utils.js
 // ========================================================================
 +function ($, App) {
+	; function require(_) { return App[_] = App[_] || {} }
+	(function (exports) {
 
-	var exports = App.utils = App.utils || {};
+		exports.isString = function (value) {
+			return typeof value === 'string'
+		}
 
-	exports.isString = function (value) {
-		return typeof value === 'string'
-	}
+		exports.isFunction = function (value) {
+			return typeof value === 'function'
+		}
 
-	exports.isFunction = function (value) {
-		return typeof value === 'function'
-	}
+		exports.isUndefined = function (value) {
+			return typeof value === 'undefined'
+		}
+		exports.isObject = function (value) {
+			// http://jsperf.com/isobject4
+			return value !== null && typeof value === 'object'
+		}
 
-	exports.isUndefined = function (value) {
-		return typeof value === 'undefined'
-	}
-	exports.isObject = function (value) {
-		// http://jsperf.com/isobject4
-		return value !== null && typeof value === 'object'
-	}
+		exports.isNumber = function (value) {
+			return typeof value === 'number'
+		}
 
-	exports.isNumber = function (value) {
-		return typeof value === 'number'
-	}
+		exports.isArray = function (arr) {
+			return Array.isArray(arr) || arr instanceof Array
+		}
 
-	exports.isArray = function (arr) {
-		return Array.isArray(arr) || arr instanceof Array
-	}
-
+	})(App.core = App.core || {})
 }(jQuery, window.ClientApp = window.ClientApp || {});
