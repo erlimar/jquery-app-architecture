@@ -14,13 +14,13 @@
     <h1>Hello My App!</h1>
     <hr />
     <div data-app-controller="home" data-app-config-title="Controller Primeira!">
-      <button class="btn btn-danger" data-app-bind="click:OnClick1">Muda!</button>
+      <button class="btn btn-danger" data-app-bind="click:ApplyTitle">Muda!</button>
       <strong data-app-gui-title>Titulo</strong>
     </div>
     <div data-app-controller="home" data-app-config-title="Segunda controller">
       <hr />
       <div>
-        <a class="btn btn-primary" href="#" data-app-bind="click:OnClick1">Link a</a>
+        <a class="btn btn-primary" href="#" data-app-bind="click:ApplyTitle">Link a</a>
       </div>
       <div>
         <h1 data-app-gui-title>...</h1>
@@ -43,7 +43,6 @@
   <!-- [APP SCRIPTS] -->
   <script src="my-app.js"></script>
   <script src="utils/uri-utils.js"></script>
-  <script src="components/ctrl-component.js"></script>
   <script src="components/toggleable-component.js"></script>
   <script src="controllers/home-controller.js"></script>
 </body>

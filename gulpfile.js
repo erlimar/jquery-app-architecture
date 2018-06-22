@@ -11,7 +11,8 @@ var headerTxt = fs.readFileSync('./header.txt'),
 var libs = [
     "lib/utils.js",
     "lib/core.js",
-    "lib/app.js"
+    "lib/app.js",
+    "lib/ctrl-component.js",
 ]
 
 gulp.task('clean', function () {

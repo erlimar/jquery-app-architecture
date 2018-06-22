@@ -1,31 +1,31 @@
 +function ($, App) {
+	; function require(_) { return App[_] = App[_] || {} }
+	(function (exports) {
 
-	var exports = App.components = App.components || {}
+		var DATA_COMPONENT = 'app-gui-toggleable'
+		var DATA_CHANGED = 'app-gui-toggleable-changed'
 
-	function ToggleableComponent() {
-		return this.each(function () {
-			var $this = $(this)
-			var text = $this.data(ToggleableComponent.DATA_COMPONENT)
-			var handler = function () {
-				var $el = $(this)
-				var current = $el.text()
+		function ToggleableComponent() {
+			return this.each(function () {
+				var $this = $(this)
+				var text = $this.data(DATA_COMPONENT)
+				var handler = function () {
+					var $el = $(this)
+					var current = $el.text()
 
-				$el.text(text)
-				text = current
+					$el.text(text)
+					text = current
 
-				$this.data(
-					ToggleableComponent.DATA_CHANGED,
-					!$this.data(ToggleableComponent.DATA_CHANGED)
-				)
-			}
-			$this.on('click', handler)
-		})
-	};
+					$this.data(DATA_CHANGED, !$this.data(DATA_CHANGED))
+				}
+				$this.on('click', handler)
+			})
+		};
 
-	ToggleableComponent.SELECTOR = '[data-app-gui-toggleable]'
-	ToggleableComponent.DATA_COMPONENT = 'app-gui-toggleable'
-	ToggleableComponent.DATA_CHANGED = 'app-gui-toggleable-changed'
+		ToggleableComponent.SELECTOR = '[data-app-gui-toggleable]'
+		ToggleableComponent.NAME = 'appToggleable'
 
-	exports['toggleable-component'] = $.fn.appToggleable = ToggleableComponent
+		exports[ToggleableComponent.NAME + '-component'] = $.fn[ToggleableComponent.NAME] = ToggleableComponent
 
+	})(App.components = App.components || {})
 }(jQuery, window.ClientApp = window.ClientApp || {});
