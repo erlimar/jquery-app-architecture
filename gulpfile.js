@@ -8,7 +8,11 @@ var fs = require('fs'),
 var headerTxt = fs.readFileSync('./header.txt'),
     bannerTxt = fs.readFileSync('./banner.txt');
 
-var libs = "lib/**/*.js"
+var libs = [
+    "lib/utils.js",
+    "lib/core.js",
+    "lib/app.js"
+]
 
 gulp.task('clean', function () {
     return del('dist/**/*');
