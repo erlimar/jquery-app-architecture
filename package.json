@@ -1,6 +1,6 @@
 {
   "name": "e5r-jquery-arch",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Arquitetura de aplicação jQuery",
   "main": "app.js",
   "repository": {

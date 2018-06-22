@@ -1,5 +1,5 @@
 /*!
- * e5r-jquery-arch v1.0.0
+ * e5r-jquery-arch v1.1.0
  * Arquitetura de aplicação jQuery (https://github.com/erlimar/jquery-app-architecture)
  * Copyright (c) Erlimar Silva Campos (erlimar@gmail.com). All rights reserved.
  * Licensed under the Apache-2.0 License. More license information in LICENSE.
