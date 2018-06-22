@@ -8,12 +8,7 @@ var fs = require('fs'),
 var headerTxt = fs.readFileSync('./header.txt'),
     bannerTxt = fs.readFileSync('./banner.txt');
 
-// A ordem eh crucial para o funcionamento da biblioteca
-var libs = [
-    'lib/utils.js',
-    'lib/core.js',
-    'lib/app.js'
-]
+var libs = "lib/**/*.js"
 
 gulp.task('clean', function () {
     return del('dist/**/*');
