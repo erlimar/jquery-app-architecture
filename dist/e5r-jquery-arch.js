@@ -6,87 +6,38 @@
  */
  
 // ========================================================================
-// app.js
+// utils.js
 // ========================================================================
-+function ($, root, App) {
++function ($, App) {
 	; function require(_) { return App[_] = App[_] || {} }
-	(function () {
+	(function (exports) {
 
-		var core = require('core')
-		var utils = require('utils')
-
-		var CONTROLLER_IDENTIFIER = 'app-controller'
-		var BIND_IDENTIFIER = 'app-bind'
-		var CONTROLLER_SELECTOR = '[data-app-controller]'
-		var BIND_SELECTOR = '[data-app-bind]'
-		var COMPONENT_SELECTOR_KEY = 'SELECTOR'
-		var COMPONENT_NAME_KEY = 'NAME'
-		var COMPONENT_SUFFIX = '-component'
-
-		var setTitle = function () {
-			var appTitle = core.getConfig('app.title')
-
-			if (appTitle)
-				$(document).attr('title', appTitle)
+		exports.isString = function (value) {
+			return typeof value === 'string'
 		}
 
-		var installControllers = function () {
-			$(CONTROLLER_SELECTOR, root).each(function () {
-				var el = $(this)
-				var name = el.data(CONTROLLER_IDENTIFIER)
-				var ctor = core.controller(name)
-				var ctrl = ctor(el)
-
-				connect(el, ctrl)
-				initComponents(el, ctrl)
-			})
+		exports.isFunction = function (value) {
+			return typeof value === 'function'
 		}
 
-		var connect = function (el, ctrl) {
-			$(BIND_SELECTOR, el).each(function () {
-				var el = $(this)
-				var binder = el.data(BIND_IDENTIFIER)
-
-				if (!utils.isString(binder) || 0 > binder.indexOf(':')) return
-
-				binder = binder.split(':')
-
-				if (!utils.isArray(binder) || binder.length < 2) retun
-
-				var event = binder[0]
-				var handler = ctrl[binder[1]]
-
-				if (!utils.isString(event) || !utils.isFunction(handler)) return
-
-				el.on(event, handler)
-				el.ctrl(ctrl)
-			})
+		exports.isUndefined = function (value) {
+			return typeof value === 'undefined'
+		}
+		exports.isObject = function (value) {
+			// http://jsperf.com/isobject4
+			return value !== null && typeof value === 'object'
 		}
 
-		var initComponents = function (el, ctrl) {
-			core.listComponents().map(function (cmp) {
-				if (!utils.isString(cmp.id)) return
-				if (!utils.isFunction(cmp.component)) return
-				if (!utils.isString(cmp.component[COMPONENT_SELECTOR_KEY])) return
-				if (!utils.isString(cmp.component[COMPONENT_NAME_KEY])) return
-				if (cmp.id.lastIndexOf(COMPONENT_SUFFIX) !== cmp.id.length - COMPONENT_SUFFIX.length) return
-
-				var jqSelector = cmp.component[COMPONENT_SELECTOR_KEY]
-				var jqFn = cmp.component[COMPONENT_NAME_KEY]
-
-				$(jqSelector, el)[jqFn](el)
-			})
+		exports.isNumber = function (value) {
+			return typeof value === 'number'
 		}
 
-		var install = function () {
-			setTitle()
-			installControllers()
+		exports.isArray = function (arr) {
+			return Array.isArray(arr) || arr instanceof Array
 		}
 
-		$(root).ready(install)
-
-	})()
-}(jQuery, document, window.ClientApp = window.ClientApp || {});
+	})(App.core = App.core || {})
+}(jQuery, window.ClientApp = window.ClientApp || {});
 
 
 // ========================================================================
@@ -190,35 +141,84 @@
 
 
 // ========================================================================
-// utils.js
+// app.js
 // ========================================================================
-+function ($, App) {
++function ($, root, App) {
 	; function require(_) { return App[_] = App[_] || {} }
-	(function (exports) {
+	(function () {
 
-		exports.isString = function (value) {
-			return typeof value === 'string'
+		var core = require('core')
+		var utils = require('utils')
+
+		var CONTROLLER_IDENTIFIER = 'app-controller'
+		var BIND_IDENTIFIER = 'app-bind'
+		var CONTROLLER_SELECTOR = '[data-app-controller]'
+		var BIND_SELECTOR = '[data-app-bind]'
+		var COMPONENT_SELECTOR_KEY = 'SELECTOR'
+		var COMPONENT_NAME_KEY = 'NAME'
+		var COMPONENT_SUFFIX = '-component'
+
+		var setTitle = function () {
+			var appTitle = core.getConfig('app.title')
+
+			if (appTitle)
+				$(document).attr('title', appTitle)
 		}
 
-		exports.isFunction = function (value) {
-			return typeof value === 'function'
+		var installControllers = function () {
+			$(CONTROLLER_SELECTOR, root).each(function () {
+				var el = $(this)
+				var name = el.data(CONTROLLER_IDENTIFIER)
+				var ctor = core.controller(name)
+				var ctrl = ctor(el)
+
+				connect(el, ctrl)
+				initComponents(el, ctrl)
+			})
 		}
 
-		exports.isUndefined = function (value) {
-			return typeof value === 'undefined'
-		}
-		exports.isObject = function (value) {
-			// http://jsperf.com/isobject4
-			return value !== null && typeof value === 'object'
+		var connect = function (el, ctrl) {
+			$(BIND_SELECTOR, el).each(function () {
+				var el = $(this)
+				var binder = el.data(BIND_IDENTIFIER)
+
+				if (!utils.isString(binder) || 0 > binder.indexOf(':')) return
+
+				binder = binder.split(':')
+
+				if (!utils.isArray(binder) || binder.length < 2) retun
+
+				var event = binder[0]
+				var handler = ctrl[binder[1]]
+
+				if (!utils.isString(event) || !utils.isFunction(handler)) return
+
+				el.on(event, handler)
+				el.ctrl(ctrl)
+			})
 		}
 
-		exports.isNumber = function (value) {
-			return typeof value === 'number'
+		var initComponents = function (el, ctrl) {
+			core.listComponents().map(function (cmp) {
+				if (!utils.isString(cmp.id)) return
+				if (!utils.isFunction(cmp.component)) return
+				if (!utils.isString(cmp.component[COMPONENT_SELECTOR_KEY])) return
+				if (!utils.isString(cmp.component[COMPONENT_NAME_KEY])) return
+				if (cmp.id.lastIndexOf(COMPONENT_SUFFIX) !== cmp.id.length - COMPONENT_SUFFIX.length) return
+
+				var jqSelector = cmp.component[COMPONENT_SELECTOR_KEY]
+				var jqFn = cmp.component[COMPONENT_NAME_KEY]
+
+				$(jqSelector, el)[jqFn](el)
+			})
 		}
 
-		exports.isArray = function (arr) {
-			return Array.isArray(arr) || arr instanceof Array
+		var install = function () {
+			setTitle()
+			installControllers()
 		}
 
-	})(App.core = App.core || {})
-}(jQuery, window.ClientApp = window.ClientApp || {});
+		$(root).ready(install)
+
+	})()
+}(jQuery, document, window.ClientApp = window.ClientApp || {});

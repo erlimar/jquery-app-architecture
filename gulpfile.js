@@ -8,12 +8,19 @@ var fs = require('fs'),
 var headerTxt = fs.readFileSync('./header.txt'),
     bannerTxt = fs.readFileSync('./banner.txt');
 
+// A ordem eh crucial para o funcionamento da biblioteca
+var libs = [
+    'lib/utils.js',
+    'lib/core.js',
+    'lib/app.js'
+]
+
 gulp.task('clean', function () {
     return del('dist/**/*');
 });
 
 gulp.task('js', function () {
-    return gulp.src('lib/**/*.js')
+    return gulp.src(libs)
         .pipe(concat.header(bannerTxt, { pkg: pkg }))
         .pipe(concat('e5r-jquery-arch.js'))
         .pipe(concat.header(headerTxt, { pkg: pkg }))
@@ -21,7 +28,7 @@ gulp.task('js', function () {
 });
 
 gulp.task('js-min', function () {
-    return gulp.src('lib/**/*.js')
+    return gulp.src(libs)
         .pipe(concat('e5r-jquery-arch.min.js'))
         .pipe(uglify())
         .pipe(concat.header(headerTxt, { pkg: pkg }))
