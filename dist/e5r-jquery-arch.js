@@ -17,6 +17,9 @@
 	var BIND_IDENTIFIER = 'app-bind'
 	var CONTROLLER_SELECTOR = '[data-app-controller]'
 	var BIND_SELECTOR = '[data-app-bind]'
+	var COMPONENT_SELECTOR_KEY = 'SELECTOR'
+    var COMPONENT_NAME_KEY = 'NAME'
+    var COMPONENT_SUFFIX = '-component'
 
 	var setTitle = function () {
 		var appTitle = core.getConfig('app.title')
@@ -33,6 +36,7 @@
 			var ctrl = ctor(el)
 
 			connect(el, ctrl)
+			initComponents(el, ctrl)
 		})
 	}
 
@@ -57,6 +61,21 @@
 		})
 	}
 
+	var initComponents = function (el, ctrl) {
+        core.listComponents().map(function (cmp) {
+            if (!utils.isString(cmp.id)) return
+            if (!utils.isFunction(cmp.component)) return
+            if (!utils.isString(cmp.component[COMPONENT_SELECTOR_KEY])) return
+            if (!utils.isString(cmp.component[COMPONENT_NAME_KEY])) return
+            if (cmp.id.lastIndexOf(COMPONENT_SUFFIX) !== cmp.id.length - COMPONENT_SUFFIX.length) return
+
+            var jqSelector = cmp.component[COMPONENT_SELECTOR_KEY]
+            var jqFn = cmp.component[COMPONENT_NAME_KEY]
+
+            $(jqSelector, el)[jqFn](el)
+        })
+    }
+
 	var install = function () {
 		setTitle()
 		installControllers()
@@ -70,7 +89,7 @@
 // ========================================================================
 // core.js
 // ========================================================================
-+function($, App) {
++function ($, App) {
 
     var exports = App.core = App.core || {}
     var controllers = App.controllers = App.controllers || {}
@@ -91,10 +110,22 @@
 
             return utils.isFunction(ctrl)
                 ? ctrl
-                : function() { }
+                : function () { }
         }
 
-        return function() { };
+        return function () { };
+    }
+
+    function _listComponents() {
+        var list = []
+
+        for (var c in components)
+            list.push({
+                id: c,
+                component: components[c]
+            })
+
+        return list
     }
 
     function _getComponent(cmpName) {
@@ -103,10 +134,10 @@
 
             return utils.isFunction(cmp)
                 ? cmp
-                : function() { }
+                : function () { }
         }
 
-        return function() { };
+        return function () { };
     }
 
     function _getConfig(key, defaultValue) {
@@ -146,6 +177,7 @@
 
     exports.controller = _registerAndGetController
     exports.component = _getComponent
+    exports.listComponents = _listComponents
     exports.getConfig = _getConfig
     exports.setConfig = _setConfig
 
